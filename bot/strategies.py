@@ -116,6 +116,15 @@ def supertrend_flip(df, n=10, mult=3.0):
     return _out(df, flip_up, flip_dn, line, line)
 
 
+def supertrend_ema200(df, n=10, mult=3.0, ema_n=200):
+    """Cambio de Supertrend solo a favor de la EMA200; SL en la línea."""
+    d, line = supertrend(df, n, mult)
+    e = ema(df["close"], ema_n)
+    flip_up = (d == 1) & (d.shift(1) == -1) & (df["close"] > e)
+    flip_dn = (d == -1) & (d.shift(1) == 1) & (df["close"] < e)
+    return _out(df, flip_up, flip_dn, line, line)
+
+
 def macd_ema200(df, atr_mult=1.5):
     """Cruce del MACD bajo/sobre cero a favor de la EMA200."""
     m = ema(df["close"], 12) - ema(df["close"], 26)
@@ -135,6 +144,7 @@ STRATEGIES = {
     "donchian": (donchian, 2.0, "Ruptura de Donchian 20 + EMA200, SL 2 ATR"),
     "rsi2": (rsi2, 1.0, "RSI(2) extremo a favor de EMA200, SL 1,5 ATR"),
     "supertrend": (supertrend_flip, 2.0, "Cambio de Supertrend(10,3), SL en la línea"),
+    "supertrend_ema200": (supertrend_ema200, 2.0, "Supertrend(10,3) solo a favor de EMA200"),
     "macd": (macd_ema200, 2.0, "Cruce MACD + EMA200, SL 1,5 ATR"),
 }
 

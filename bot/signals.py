@@ -86,7 +86,7 @@ def notify(df, sig_pos, sym, tf, name, side, entry, sl, rr, close_time, cfg, pre
     try:
         from .chart import render
         from .strategies import supertrend
-        if name == "supertrend":
+        if name.startswith("supertrend"):
             st_dir, st_line = supertrend(df)
         else:
             st_dir = pd.Series(0, index=df.index)
