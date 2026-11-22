@@ -2,7 +2,7 @@ name: Señales
 
 on:
   schedule:
-    - cron: "1,16,31,46 * * * *"   # 1 min después del cierre de cada vela de 15m (UTC)
+    - cron: "2,17,32,47 * * * *"   # 2 min después del cierre de cada vela de 15m (UTC)
   workflow_dispatch:
     inputs:
       prueba:
