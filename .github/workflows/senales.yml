@@ -9,6 +9,10 @@ on:
         description: "Mandar mensaje de prueba a Telegram"
         type: boolean
         default: false
+      ejemplo:
+        description: "Mandar la última señal pasada como ejemplo (con gráfico)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -35,6 +39,8 @@ jobs:
         run: |
           if [ "${{ inputs.prueba }}" = "true" ]; then
             python -m bot.signals --test
+          elif [ "${{ inputs.ejemplo }}" = "true" ]; then
+            python -m bot.signals --ejemplo
           else
             python -m bot.signals
             python -m bot.seguimiento --silencio
