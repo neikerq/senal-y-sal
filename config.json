@@ -1,0 +1,9 @@
+{
+  "strategies": [
+    {"name": "ema_pullback", "tf": "15m", "symbols": ["XRPUSDT", "DOGEUSDT"]}
+  ],
+  "position_usdt": 6,
+  "min_risk_pct": 0.4,
+  "max_risk_pct": 1.5,
+  "max_signal_age_min": 20
+}
