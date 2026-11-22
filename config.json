@@ -1,9 +1,10 @@
 {
   "strategies": [
-    {"name": "ema_pullback", "tf": "15m", "symbols": ["XRPUSDT", "DOGEUSDT"]}
+    {"name": "supertrend", "tf": "1h", "symbols": ["SOLUSDT", "DOGEUSDT", "ADAUSDT", "XRPUSDT"]}
   ],
+  "paper": true,
   "position_usdt": 6,
   "min_risk_pct": 0.4,
-  "max_risk_pct": 1.5,
+  "max_risk_pct": 3.0,
   "max_signal_age_min": 20
 }

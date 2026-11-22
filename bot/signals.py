@@ -18,7 +18,19 @@ from .strategies import STRATEGIES, TF_DELTA, run
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "config.json"
 STATE = ROOT / "state.json"
+LOG = ROOT / "senales.csv"
 TZ = "America/Caracas"
+LOG_COLS = ["cierre_vela", "par", "tf", "estrategia", "lado", "entrada", "sl", "tp",
+            "estado", "r", "salida_hora"]
+
+
+def log_signal(close_time, sym, tf, name, side, entry, sl, rr):
+    tp = entry + side * rr * abs(entry - sl)
+    new = not LOG.exists()
+    with LOG.open("a") as f:
+        if new:
+            f.write(",".join(LOG_COLS) + "\n")
+        f.write(f"{close_time.isoformat()},{sym},{tf},{name},{side},{entry},{sl},{tp},abierta,,\n")
 
 
 def fmt(p):
@@ -49,7 +61,10 @@ def message(sym, tf, name, side, entry, sl, rr, close_time, cfg):
     size = cfg["position_usdt"]
     age = (pd.Timestamp.now(tz="UTC") - close_time).total_seconds() / 60
     head = "🟢 <b>LONG</b>" if side == 1 else "🔴 <b>SHORT</b>"
-    lines = [
+    lines = []
+    if cfg.get("paper"):
+        lines.append("📝 <i>Prueba sin dinero: no operar, solo se registra.</i>")
+    lines += [
         f"{head} {sym}  ({tf} · {name})",
         f"Entrada: <b>{fmt(entry)}</b>  (cierre {close_time.tz_convert(TZ):%d/%m %H:%M})",
         f"SL: <b>{fmt(sl)}</b>  ({'-' if side == 1 else '+'}{risk_pct:.2f}%)",
@@ -85,6 +100,8 @@ def check(cfg, state):
                 close_time = t + pd.Timedelta(TF_DELTA[tf])
                 send(message(sym, tf, name, int(row["side"]), entry, row["sl"],
                              row["rr"], close_time, cfg))
+                log_signal(close_time, sym, tf, name, int(row["side"]), entry,
+                           row["sl"], row["rr"])
                 sent += 1
             state[key] = sig.index[-1].isoformat()
     return sent
@@ -97,7 +114,8 @@ def main():
     cfg = json.loads(CONFIG.read_text())
     if a.test:
         names = ", ".join(f"{s['name']} {s['tf']} {'/'.join(s['symbols'])}" for s in cfg["strategies"])
-        send(f"✅ Bot de señales conectado.\nVigilando: {names}")
+        modo = "prueba sin dinero" if cfg.get("paper") else "real"
+        send(f"✅ Bot de señales conectado ({modo}).\nVigilando: {names}")
         return
     state = json.loads(STATE.read_text()) if STATE.exists() else {}
     n = check(cfg, state)

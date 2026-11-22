@@ -37,6 +37,9 @@ Edita `config.json`:
 ```
 Estrategias disponibles: `ema_pullback`, `donchian`, `rsi2`, `supertrend`, `macd` (ver `bot/strategies.py`).
 
+## Prueba sin dinero
+Con `"paper": true` en `config.json`, cada señal llega marcada como prueba y queda registrada en `senales.csv`. Cada 15 min el bot revisa si las señales abiertas tocaron el TP o el SL. Los lunes a las 08:07 (hora de Caracas) manda un resumen en R; también se puede pedir a mano en *Actions → Seguimiento → Run workflow*.
+
 ## Notas
 - Los datos son de **Spot**; el precio del perpetuo difiere muy poco.
 - GitHub puede atrasar las ejecuciones programadas varios minutos. Si la señal llega tarde, el mensaje lo avisa.

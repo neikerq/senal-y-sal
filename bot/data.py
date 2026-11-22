@@ -85,3 +85,27 @@ def history(symbol, interval, days):
     df = _to_df(rows)
     now = pd.Timestamp.now(tz="UTC")
     return df[df["close_time"] < now]
+
+
+def since(symbol, interval, start):
+    """Velas cerradas desde `start` (Timestamp UTC) hasta ahora."""
+    step = INTERVAL_MS[interval]
+    cur = int(pd.Timestamp(start).timestamp() * 1000)
+    end = int(time.time() * 1000)
+    rows = []
+    while cur < end:
+        chunk = _get(
+            "/api/v3/klines",
+            {"symbol": symbol, "interval": interval, "startTime": cur, "limit": 1000},
+        )
+        if not chunk:
+            break
+        rows.extend(chunk)
+        cur = chunk[-1][0] + step
+        if len(chunk) < 1000:
+            break
+    if not rows:
+        return pd.DataFrame(columns=["open", "high", "low", "close", "volume", "close_time"])
+    df = _to_df(rows)
+    now = pd.Timestamp.now(tz="UTC")
+    return df[df["close_time"] < now]
